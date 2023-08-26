@@ -33,7 +33,7 @@ Resources:
             S3KeyPrefix: !Ref S3TemplateKeyPrefix
       Parameters:
         EC2KeyPairName: !Ref EC2KeyPairName
-        Ec2SecurityGroupIds: 
+        Ec2SecurityGroupIds:
           Fn::ImportValue: !Sub "${PrereqStackName}-security-ec2-sg-ids"
         S3BucketRegion: !Ref S3BucketRegion
         S3TemplateBucketName: !Ref S3TemplateBucketName

@@ -23,10 +23,6 @@ Resources:
           - S3BucketRegion: !Ref S3BucketRegion
             S3Bucket: !Ref S3TemplateBucketName
             S3KeyPrefix: !Ref S3TemplateKeyPrefix
-      Parameters:
-        S3BucketRegion: !Ref S3BucketRegion
-        S3TemplateBucketName: !Ref S3TemplateBucketName
-        S3TemplateKeyPrefix: !Ref S3TemplateKeyPrefix
   CognitoUserPoolClientId:
     Type: AWS::CloudFormation::Stack
     Properties:
