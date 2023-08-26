@@ -14,7 +14,7 @@ Parameters:
 Resources:
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
-    Properties: 
+    Properties:
       GroupDescription: Security Group managed by Security
 
   EC2SecurityGroupIngress1:
@@ -23,7 +23,10 @@ Resources:
       Description: Ingress Rule 1
       CidrIp: !Ref Ec2SGInboundCIDR1
       FromPort: 443
-      GroupId: !Ref EC2SecurityGroup
+      GroupId:
+        Fn::GetAtt:
+          - EC2SecurityGroup
+          - GroupId
       IpProtocol: tcp
       ToPort: 443
 
@@ -33,17 +36,23 @@ Resources:
       Description: Ingress Rule 2
       CidrIp: !Ref Ec2SGInboundCIDR2
       FromPort: 443
-      GroupId: !Ref EC2SecurityGroup
+      GroupId:
+        Fn::GetAtt:
+          - EC2SecurityGroup
+          - GroupId
       IpProtocol: tcp
       ToPort: 443
 
   EC2SecurityGroupEgress1:
     Type: AWS::EC2::SecurityGroupEgress
-    Properties: 
+    Properties:
       Description: Egress Rule 1
       CidrIp: !Ref Ec2SGOutboundCIDR1
       FromPort: 443
-      GroupId: !Ref EC2SecurityGroup
+      GroupId:
+        Fn::GetAtt:
+          - EC2SecurityGroup
+          - GroupId
       IpProtocol: tcp
       ToPort: 443
 Outputs:
@@ -51,8 +60,12 @@ Outputs:
     Description: Security Group Ids
     Value: !Join
       - ','
-      - - !Ref EC2SecurityGroup
+      - - !GetAtt
+            - EC2SecurityGroup
+            - GroupId
   oSecurityGroup1Id:
     Description: Security Group Id
-    Value: !Ref EC2SecurityGroup
-    
+    Value:
+      Fn::GetAtt:
+        - EC2SecurityGroup
+        - GroupId
