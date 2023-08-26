@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation example for sharing Stack information using git submodules
+Parameters:
+  Ec2SGOutboundCIDR1:
+    Description: IP CIDR
+    Type: String
+    Default: '0.0.0.0/0'
+  Ec2SGInboundCIDR1:
+    Description: IP CIDR
+    Type: String
+  Ec2SGInboundCIDR2:
+    Description: IP CIDR
+    Type: String
+Resources:
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Security Group managed by Security
+
+  EC2SecurityGroupIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress Rule 1
+      CidrIp: !Ref Ec2SGInboundCIDR1
+      FromPort: 443
+      GroupId: !Ref EC2SecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+
+  EC2SecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress Rule 2
+      CidrIp: !Ref Ec2SGInboundCIDR2
+      FromPort: 443
+      GroupId: !Ref EC2SecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+
+  EC2SecurityGroupEgress1:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties: 
+      Description: Egress Rule 1
+      CidrIp: !Ref Ec2SGOutboundCIDR1
+      FromPort: 443
+      GroupId: !Ref EC2SecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+Outputs:
+  oSecurityGroupIds:
+    Description: Security Group Ids
+    Value: !Join
+      - ','
+      - - !Ref EC2SecurityGroup
+  oSecurityGroup1Id:
+    Description: Security Group Id
+    Value: !Ref EC2SecurityGroup
+    

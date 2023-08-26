@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 Template
+Conditions:
+  DisabbleAttachEC2SG:
+    Fn::Equals:
+      - Fn::Join:
+          - ','
+          - Ref: Ec2SecurityGroupIds
+      - ''
+Parameters:
+  EC2KeyPairName:
+    Description: >-
+      Name of an existing Amazon EC2 public/private key pair to enable remote
+      access to instances.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  Ec2ImageId:
+    Description: EC2 AMI Id
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  Ec2SecurityGroupIds:
+    Description: Comma delimited list of EC2 Security Group Ids to attach to the EC2 instance
+    Type: CommaDelimitedList
+    Default: ''
+  S3BucketRegion:
+    Description: CF Template S3 Bucket Region
+    Type: String
+    Default: 'ap-southeast-2'
+  S3TemplateBucketName:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: 'overwrite-me'
+  S3TemplateKeyPrefix:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: ''
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          files:
+            /tmp/file.txt:
+              content: !Base64 |
+                Content of my file
+              mode: "000644"
+              owner: "root"
+              group: "root"
+    Properties:
+      KeyName: !Ref EC2KeyPairName
+      ImageId: !Ref Ec2ImageId
+      SecurityGroupIds: !If
+        - DisabbleAttachEC2SG
+        - !Ref AWS::NoValue
+        - !Ref Ec2SecurityGroupIds
+  Ec2InstanceIdParameterStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName: !Sub "/${AWS::StackName}/EC2/InstanceId"
+        ParameterValue: !Ref MyEC2Instance
+Outputs:
+  oEc2InstanceIdParameterName:
+    Description: EC2 Instance Id Parameter Name
+    Value: !GetAtt 'Ec2InstanceIdParameterStack.Outputs.oSsmParameterName'

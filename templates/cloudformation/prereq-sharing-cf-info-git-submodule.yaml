@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation example for sharing Stack information using git submodules
+Parameters:
+  S3BucketRegion:
+    Description: CF Template S3 Bucket Region
+    Type: String
+    Default: 'ap-southeast-2'
+  S3TemplateBucketName:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: 'overwrite-me'
+  S3TemplateKeyPrefix:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: ''
+  InboundCIDR1:
+    Description: Inbound CIDR
+    Type: String
+  InboundCIDR2:
+    Description: Inbound CIDR
+    Type: String
+Resources:
+  SecurityStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/prereq-security-sharing-cf-info-git-submodule.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        Ec2SGInboundCIDR1: !Ref InboundCIDR1
+        Ec2SGInboundCIDR2: !Ref InboundCIDR2
+Outputs:
+  oPrereqStackName:
+    Description: Prereq Stack Name
+    Value: !Ref AWS::StackName
+  oEc2SecurityGroupIds:
+    Description: EC2 Security Group Ids
+    Value: !GetAtt 'SecurityStack.Outputs.oSecurityGroupIds'
+    Export:
+      Name: !Sub "${AWS::StackName}-security-ec2-sg-ids"
+  oEc2SecurityGroup1Id:
+    Description: EC2 Security Group 1 Id
+    Value: !GetAtt 'SecurityStack.Outputs.oSecurityGroup1Id'
+    Export:
+      Name: !Sub "${AWS::StackName}-security-ec2-sg1-id"

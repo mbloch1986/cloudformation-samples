@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: API Gateway Template
+Parameters:
+  SubnetIds:
+    Description: Comma delimited list of Subent IDs to associate with the API GW VPC Lnk
+    Type: CommaDelimitedList
+  SecurityGroupIds:
+    Description: Comma delimited list of Security Group IDs to associate wioth the API GW VPC Link
+    Type: CommaDelimitedList
+Resources:
+  ApiGwVpcLink:
+    Type: AWS::ApiGatewayV2::VpcLink
+    Properties:
+      Name: String
+      SecurityGroupIds: !Ref SecurityGroupIds
+      SubnetIds: !Ref SubnetIds
+Outputs:
+  oApiGwVpcLinkId:
+    Description: The API GW VPC Link ID
+    Value: !Ref ApiGwVpcLink

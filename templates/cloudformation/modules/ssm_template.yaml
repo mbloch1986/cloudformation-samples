@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SSM Template
+Conditions:
+  EnableCustomSSMParameterName:
+    Fn::Not:
+      - Fn::Equals:
+          - Ref: ParameterName
+          - ''
+Parameters:
+  ParameterName:
+    Description: SSM Parameter Name
+    Type: String
+    Default: ''
+  ParameterValue:
+    Description: SSM Parameter Value
+    Type: String
+Resources:
+  SSMParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !If
+        - EnableCustomSSMParameterName
+        - !Ref ParameterName
+        - !Ref 'AWS::NoValue'
+      Description: SSM Parameter
+      Type: String
+      Value: !Ref ParameterValue
+Outputs:
+  oSsmParameterName:
+    Description: SSM Parameter Name
+    Value: !Ref SSMParameter

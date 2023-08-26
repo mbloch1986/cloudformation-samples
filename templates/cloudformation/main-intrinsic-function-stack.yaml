@@ -1,0 +1,171 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::LanguageExtensions'
+Description: Nested Stack CloudFormation example
+Parameters:
+  EC2KeyPairName:
+    Description: >-
+      Name of an existing Amazon EC2 public/private key pair to enable remote
+      access to instances.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  S3BucketRegion:
+    Description: CF Template S3 Bucket Region
+    Type: String
+    Default: 'ap-southeast-2'
+  S3TemplateBucketName:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: 'overwrite-me'
+  S3TemplateKeyPrefix:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: ''
+Resources:
+  Base64ParameterStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName:
+          Fn::Sub: ${AWS::StackName}-Base64Parameter
+        ParameterValue:
+          Fn::Base64: !Sub |
+            This is my stack ${AWS::StackName} in Base64
+  SubParameter:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName:
+          Fn::Sub: ${AWS::StackName}-SubParameter
+        ParameterValue:
+          Fn::Sub: "This is my ${AWS::StackName} using Fn::Sub"
+  SubMappingParameter:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName:
+          Fn::Sub: ${AWS::StackName}-SubMappingParameter
+        ParameterValue:
+          Fn::Sub:
+            - "This is My ${Stack} using ${Function}"
+            - Stack:
+                Ref: AWS::StackName
+              Function: 'Fn::Sub'
+  SubMappingAdvancedParameter:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName:
+          Fn::Sub: ${AWS::StackName}-SubMappingAdvancedParameter
+        ParameterValue:
+          Fn::Sub:
+            - "This is my ${Stack} in ${Region} "
+            - Stack:
+                Ref: AWS::StackName
+              Region:
+                Fn::Select:
+                  - 3
+                  - Fn::Split:
+                    - ':'
+                    - "arn:aws:cloudformation:ap-southeast-2:1234567890:stack/Stack/9876543210"
+  JoinedParameter:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName:
+          Fn::Sub: ${AWS::StackName}-JoinedParameter
+        ParameterValue:
+          Fn::Join:
+            - ':'
+            - - 'arn'
+              - 'aws'
+              - 'cloudformation'
+              - 'ap-southeast-2'
+              - '1234567890'
+              - 'stack/Stack/9876543210'
+  SplitParameter:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name:
+        Fn::Sub: ${AWS::StackName}-SplitParameter
+      Description: Split Parameter
+      Type: String
+      Value:
+        Fn::ToJsonString:
+            Fn::Split:
+              - ':'
+              - "arn:aws:cloudformation:ap-southeast-2:1234567890:stack/Stack/9876543210"
+  SelectSplitParameter:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName:
+          Fn::Sub: ${AWS::StackName}-SelectSplitParameter
+        ParameterValue:
+          Fn::Select:
+            - '3'
+            - Fn::Split:
+                - ':'
+                - "arn:aws:cloudformation:ap-southeast-2:1234567890:stack/Stack/9876543210"
+  JSONToStringParameter:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ssm_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        ParameterName:
+          Fn::Sub: ${AWS::StackName}-JSONToStringParameter
+        ParameterValue:
+          Fn::ToJsonString:
+            key1: "arn:aws:cloudformation:ap-southeast-2:1234567890:stack/Stack/9876543210"
+            key2: "arn:aws:cloudformation:ap-southeast-2:9876543210:stack/Stack/1234567890"
+  Fn::ForEach::Instances:
+    - EC2InstanceId
+    - [First, Second, Third]
+    - ${EC2InstanceId}Instance:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+          TemplateURL: !Sub 'https://${S3TemplateBucketName}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3TemplateKeyPrefix}templates/cloudformation/modules/ec2_template.yaml'
+          Parameters:
+            EC2KeyPairName: !Ref EC2KeyPairName
+            S3BucketRegion: !Ref S3BucketRegion
+            S3TemplateBucketName: !Ref S3TemplateBucketName
+            S3TemplateKeyPrefix: !Ref S3TemplateKeyPrefix

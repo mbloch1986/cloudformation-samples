@@ -1,0 +1,48 @@
+---
+project:
+  owner: michael.blum@shinesolutions.com
+  name: cf-examples
+  regions:
+    - ap-northeast-1
+    - ap-northeast-2
+    - ap-south-1
+    - ap-southeast-1
+    - ap-southeast-2
+    - eu-central-1
+    - eu-north-1
+    - eu-west-1
+    - eu-west-2
+    - eu-west-3
+    - sa-east-1
+    - us-east-1
+    - us-west-1
+    - us-east-2
+    - us-west-2
+    - ca-central-1
+  parameters:
+    S3TemplateBucketName: "$[taskcat_autobucket]"
+    S3BucketRegion: "$[taskcat_current_region]"
+    S3TemplateKeyPrefix: cf-examples/
+tests:
+  nested-stack-example:
+    regions:
+      - ap-southeast-2
+    template: stacks/nested-stack.yaml
+    parameters:
+      EC2KeyPairName: "$[taskcat_getkeypair]"
+  sharing-cf-info-example:
+    regions:
+      - ap-southeast-2
+    template: stacks/sharing-cf-info.yaml
+  sharing-cf-info-git-submodule-example:
+    regions:
+      - ap-southeast-2
+    template: stacks/sharing-cf-info-git-submodule.yaml
+    parameters:
+      AvailabilityZones: ap-southeast-2a,ap-southeast-2b
+  intrinsic-function-stack-example:
+    regions:
+      - ap-southeast-2
+    template: stacks/intrinsic-function-stack.yaml
+    parameters:
+      EC2KeyPairName: "$[taskcat_getkeypair]"

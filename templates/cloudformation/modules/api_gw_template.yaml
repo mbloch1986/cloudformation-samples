@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: API Gateway Template
+Parameters:
+  PrereqStackName:
+    Description: Prerequisite Stack Name
+    Type: String
+Resources:
+  ApiGatwayEndpoint:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-api-gw"
+      ProtocolType: HTTP
+
+  ApiGwRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGatwayEndpoint
+      RouteKey: "GET /hello"
+      AuthorizationType: NONE
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref ApiGwIntegration
+
+  ApiGwIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGatwayEndpoint
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      PayloadFormatVersion: '1.0'
+      IntegrationUri: "http://mockbin.org/request"
+
+  ApiGwAuthorizer:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      ApiId: !Ref ApiGatwayEndpoint
+      Name: !Sub "${AWS::StackName}-ApiGwAuthorizer"
+      AuthorizerType: JWT
+      IdentitySource: 
+        - "$request.header.Authorization"
+      JwtConfiguration:
+        Audience:
+          - !Sub "{{resolve:ssm:/${PrereqStackName}/Cognito/UserPoolClientId}}"
+        Issuer: !Join 
+          - ''
+          - - "https://cognito-idp."
+            - !Ref AWS::Region
+            - ".amazonaws.com/"
+            - Fn::ImportValue: !Sub "${PrereqStackName}-cognito-user-pool-id"
+Outputs:
+  oApiGatwayEndpointUrl:
+    Description: The endpoint URL of the created API Gateway
+    Value: !Sub "https://${ApiGatwayEndpoint}.execute-api.${AWS::Region}.amazonaws.com"

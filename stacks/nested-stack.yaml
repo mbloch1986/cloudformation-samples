@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Nested Stack CloudFormation example
+Parameters:
+  EC2KeyPairName:
+    Description: >-
+      Name of an existing Amazon EC2 public/private key pair to enable remote
+      access to instances.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  S3BucketRegion:
+    Description: CF Template S3 Bucket Region
+    Type: String
+    Default: 'ap-southeast-2'
+  S3TemplateBucketName:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: 'overwrite-me'
+  S3TemplateKeyPrefix:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: ''
+Resources:
+  NestedStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/main-nested-stack.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        EC2KeyPairName: !Ref EC2KeyPairName
+        S3BucketRegion: !Ref S3BucketRegion
+        S3TemplateBucketName: !Ref S3TemplateBucketName
+        S3TemplateKeyPrefix: !Ref S3TemplateKeyPrefix
+Outputs:
+  oEc2TestParameterName:
+    Description: EC2 Test Parameter Name
+    Value: !GetAtt 'NestedStack.Outputs.oEc2TestParameterName'
+  oEc2InstanceIdParameterName:
+    Description: EC2 Instance Id Parameter Name
+    Value: !GetAtt 'NestedStack.Outputs.oEc2InstanceIdParameterName'

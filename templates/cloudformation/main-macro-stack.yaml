@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::LanguageExtensions'
+Description: Nested Stack CloudFormation example
+Parameters:
+  S3TemplateBucketName:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: 'overwrite-me'
+Resources:
+  rMacroLambdaExecRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        Path: "/"
+        Policies:
+          - PolicyName: lambda-cw-access
+            PolicyDocument:
+              Statement:
+                - Sid: LambdaAccessForCWLogGroup
+                  Effect: Allow
+                  Action: logs:CreateLogGroup
+                  Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:*
+                - Sid: LambdaAccessForCWLogs
+                  Effect: Allow
+                  Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+          - PolicyName: lambda-s3-access
+            PolicyDocument:
+              Statement:
+                - Sid: ListObjectsInBucket
+                  Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                  Resource:
+                    - !Sub "arn:${AWS::Partition}:s3:::${S3TemplateBucketName}"
+                - Sid: AllObjectActions
+                  Effect: Allow
+                  Action:
+                    - s3:GetObject
+                  Resource:
+                    - !Sub "arn:${AWS::Partition}:s3:::${S3TemplateBucketName}/*"
+  rMergeTagsFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Description: "Merge local tags with common tags in a JSON file"
+      Handler: index.handler
+      Role: !GetAtt "rMacroLambdaExecRole.Arn"
+      Timeout: 300
+      Runtime: python3.9
+      ReservedConcurrentExecutions: 2
+      Code:
+        ZipFile: |
+          import json
+
+          def handler(event, context):
+              print(json.dumps(event, indent=2))
+
+              response = {"requestId": event["requestId"], "status": "success"}
+
+              response["fragment"] = []
+              params = event["params"]
+              templateParams = event["templateParameterValues"]
+
+              tags = {
+                  "Tags": [
+                      {"Key": "CreatedBy", "Value": {"Ref": "AWS::StackId"}},
+                      {"Key": "Team", "Value": "my-team"},
+                      {"Key": "Owner", "Value": "my-team@example.com"},
+                      {"Key": "Org", "Value": "my-org"},
+                  ]
+              }
+
+              for tag in tags["Tags"]:
+                  response["fragment"].append(tag)
+
+              for k in params:
+                  response["fragment"].append({"Key": k, "Value": params[k]})
+
+              return response
+
+  mMergeTags:
+    Type: AWS::CloudFormation::Macro
+    Properties:
+      Name: MergeTags
+      Description: Merge local tags with common tags
+      FunctionName: !GetAtt rMergeTagsFunction.Arn

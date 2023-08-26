@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation example for sharing Stack information & using Git Submodules
+Parameters:
+  S3BucketRegion:
+    Description: CF Template S3 Bucket Region
+    Type: String
+    Default: 'ap-southeast-2'
+  S3TemplateBucketName:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: 'overwrite-me'
+  S3TemplateKeyPrefix:
+    Description: CF Template S3 Bucket
+    Type: String
+    Default: ''
+  EC2KeyPairName:
+    Description: >-
+      Name of an existing Amazon EC2 public/private key pair to enable remote
+      access to instances.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  PrereqStackName:
+    Description: Prerequisite Stack Name
+    Type: String
+Resources:
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3BucketRegion}.${AWS::URLSuffix}/${S3KeyPrefix}templates/cloudformation/modules/ec2_template.yaml'
+          - S3BucketRegion: !Ref S3BucketRegion
+            S3Bucket: !Ref S3TemplateBucketName
+            S3KeyPrefix: !Ref S3TemplateKeyPrefix
+      Parameters:
+        EC2KeyPairName: !Ref EC2KeyPairName
+        Ec2SecurityGroupIds: 
+          Fn::ImportValue: !Sub "${PrereqStackName}-security-ec2-sg-ids"
+        S3BucketRegion: !Ref S3BucketRegion
+        S3TemplateBucketName: !Ref S3TemplateBucketName
+        S3TemplateKeyPrefix: !Ref S3TemplateKeyPrefix
+Outputs:
+  oEc2InstanceIdParameterName:
+    Description: EC2 Test Parameter Name
+    Value: !GetAtt 'EC2Stack.Outputs.oEc2InstanceIdParameterName'
