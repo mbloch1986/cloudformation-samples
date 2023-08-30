@@ -8,6 +8,10 @@ Parameters:
     Description: Comma delimited list of Security Group IDs to associate wioth the API GW VPC Link
     Type: CommaDelimitedList
 Resources:
+  ######################################## 
+  # API Gateway
+  ######################################## 
+  # API Gateway VPC Link
   ApiGwVpcLink:
     Type: AWS::ApiGatewayV2::VpcLink
     Properties:

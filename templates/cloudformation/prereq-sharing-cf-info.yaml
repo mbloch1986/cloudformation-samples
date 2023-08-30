@@ -14,6 +14,7 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  # Create Cognito Stack for Main Stack
   CognitoStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -23,6 +24,8 @@ Resources:
           - S3BucketRegion: !Ref S3BucketRegion
             S3Bucket: !Ref S3TemplateBucketName
             S3KeyPrefix: !Ref S3TemplateKeyPrefix
+
+  # Store Cognito User Pool Client ID in SSM
   CognitoUserPoolClientId:
     Type: AWS::CloudFormation::Stack
     Properties:

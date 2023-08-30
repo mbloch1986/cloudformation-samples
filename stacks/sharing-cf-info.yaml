@@ -14,6 +14,7 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  # Create Prerequisite Stack for the main stack
   PrereqStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -27,6 +28,9 @@ Resources:
         S3BucketRegion: !Ref S3BucketRegion
         S3TemplateBucketName: !Ref S3TemplateBucketName
         S3TemplateKeyPrefix: !Ref S3TemplateKeyPrefix
+
+  # Create main Stack to consume the resources
+  # from the prerequisite stack
   MainStack:
     Type: AWS::CloudFormation::Stack
     Properties:

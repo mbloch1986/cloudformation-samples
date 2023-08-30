@@ -19,6 +19,7 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  # Stack to test the intrinsic functions of AWS CloudFormatoin
   MainStack:
     Type: AWS::CloudFormation::Stack
     Properties:

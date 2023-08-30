@@ -15,6 +15,10 @@ Parameters:
     Description: SSM Parameter Value
     Type: String
 Resources:
+  ######################################## 
+  # SSM
+  ######################################## 
+  #  SSM Parameter
   SSMParameter:
     Type: AWS::SSM::Parameter
     Properties:

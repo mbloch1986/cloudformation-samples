@@ -34,6 +34,10 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  ######################################## 
+  # EC2
+  ######################################## 
+  # EC2 Instance
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -53,6 +57,11 @@ Resources:
         - DisabbleAttachEC2SG
         - !Ref AWS::NoValue
         - !Ref Ec2SecurityGroupIds
+
+  ######################################## 
+  # SSM Parameter
+  ######################################## 
+  # EC2 Instance ID SSM Parameter
   Ec2InstanceIdParameterStack:
     Type: AWS::CloudFormation::Stack
     Properties:

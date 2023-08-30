@@ -14,6 +14,7 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  # Stack to create CloudFormation macro
   MacroStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -25,6 +26,8 @@ Resources:
             S3KeyPrefix: !Ref S3TemplateKeyPrefix
       Parameters:
         S3TemplateBucketName: !Ref S3TemplateBucketName
+  
+  # Stack to test the created CloudFormation macro
   MacroExampleStack:
     Type: AWS::CloudFormation::Stack
     Properties:

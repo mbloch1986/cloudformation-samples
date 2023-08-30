@@ -17,6 +17,7 @@ Parameters:
     Description: Prerequisite Stack Name
     Type: String
 Resources:
+  # Creation of API Gateway Stack
   ApiGwStack:
     Type: AWS::CloudFormation::Stack
     Properties:

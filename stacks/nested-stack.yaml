@@ -19,6 +19,7 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  # Stack to test the creation of a Stack with nested stacks
   NestedStack:
     Type: AWS::CloudFormation::Stack
     Properties:

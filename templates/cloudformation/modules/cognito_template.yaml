@@ -1,9 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Cognito Template
 Resources:
+  ######################################## 
+  # Cognito
+  ######################################## 
+  # Cognito User Pool
   CognitoUserPool:
     Type: "AWS::Cognito::UserPool"
 
+  # Cognito User Pool Client
   CognitoUserPoolClient:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:

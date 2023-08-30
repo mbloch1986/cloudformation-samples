@@ -12,6 +12,10 @@ Parameters:
     Description: IP CIDR
     Type: String
 Resources:
+######################################## 
+# EC2 Security Group
+######################################## 
+# Security Group
   EC2SecurityGroup:
     Metadata:
       cfn_nag:
@@ -24,6 +28,7 @@ Resources:
     Properties:
       GroupDescription: Security Group managed by Security
 
+  # Security Group Ingress Rules
   EC2SecurityGroupIngress1:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -50,6 +55,8 @@ Resources:
       IpProtocol: tcp
       ToPort: 443
 
+
+  # Security Group Egress Rules
   EC2SecurityGroupEgress1:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:

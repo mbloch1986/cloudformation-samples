@@ -5,12 +5,17 @@ Parameters:
     Description: Prerequisite Stack Name
     Type: String
 Resources:
+  ######################################## 
+  # API Gateway
+  ######################################## 
+  # API Gateway API Endpoint
   ApiGatwayEndpoint:
     Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: !Sub "${AWS::StackName}-api-gw"
       ProtocolType: HTTP
-
+ 
+  # API Gateway Route
   ApiGwRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -21,7 +26,8 @@ Resources:
         - /
         - - integrations
           - !Ref ApiGwIntegration
-
+ 
+  # API Gateway Integration
   ApiGwIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
@@ -30,7 +36,8 @@ Resources:
       IntegrationMethod: ANY
       PayloadFormatVersion: '1.0'
       IntegrationUri: "http://mockbin.org/request"
-
+ 
+  # API Gateway Authorizer
   ApiGwAuthorizer:
     Type: AWS::ApiGatewayV2::Authorizer
     Properties:

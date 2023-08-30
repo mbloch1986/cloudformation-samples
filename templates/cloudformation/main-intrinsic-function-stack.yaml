@@ -20,6 +20,7 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  # Test of Intrinsic Function Base64 
   Base64ParameterStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -35,6 +36,8 @@ Resources:
         ParameterValue:
           Fn::Base64: !Sub |
             This is my stack ${AWS::StackName} in Base64
+
+  # Test of Intrinsic Function Sub 
   SubParameter:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -49,6 +52,8 @@ Resources:
           Fn::Sub: ${AWS::StackName}-SubParameter
         ParameterValue:
           Fn::Sub: "This is my ${AWS::StackName} using Fn::Sub"
+
+  # Test of Intrinsic Function Sub with mapping
   SubMappingParameter:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -67,6 +72,9 @@ Resources:
             - Stack:
                 Ref: AWS::StackName
               Function: 'Fn::Sub'
+
+  # Test of Intrinsic Function Sub with mapping
+  # & using split to select the mapping value
   SubMappingAdvancedParameter:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -90,6 +98,8 @@ Resources:
                   - Fn::Split:
                     - ':'
                     - "arn:aws:cloudformation:ap-southeast-2:1234567890:stack/Stack/9876543210"
+
+  # Test of Intrinsic Function Join
   JoinedParameter:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -111,6 +121,8 @@ Resources:
               - 'ap-southeast-2'
               - '1234567890'
               - 'stack/Stack/9876543210'
+
+  # Test of Intrinsic Function Split
   SplitParameter:
     Type: "AWS::SSM::Parameter"
     Properties:
@@ -123,6 +135,8 @@ Resources:
             Fn::Split:
               - ':'
               - "arn:aws:cloudformation:ap-southeast-2:1234567890:stack/Stack/9876543210"
+
+  # Test of Intrinsic Function Select from a splitted string
   SelectSplitParameter:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -141,6 +155,8 @@ Resources:
             - Fn::Split:
                 - ':'
                 - "arn:aws:cloudformation:ap-southeast-2:1234567890:stack/Stack/9876543210"
+
+  # Test of Intrinsic Function JSON to String
   JSONToStringParameter:
     Type: AWS::CloudFormation::Stack
     Properties:

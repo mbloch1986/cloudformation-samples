@@ -19,6 +19,7 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  # Creation of EC2 Stack
   EC2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -33,6 +34,8 @@ Resources:
         S3BucketRegion: !Ref S3BucketRegion
         S3TemplateBucketName: !Ref S3TemplateBucketName
         S3TemplateKeyPrefix: !Ref S3TemplateKeyPrefix
+
+  # Creation of SSM Parameter Stack
   SSMTestParameterStack:
     Type: AWS::CloudFormation::Stack
     Properties:

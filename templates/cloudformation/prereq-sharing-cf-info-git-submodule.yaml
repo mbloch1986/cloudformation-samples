@@ -20,6 +20,7 @@ Parameters:
     Description: Inbound CIDR
     Type: String
 Resources:
+  # Create Security Stack for Main stack
   SecurityStack:
     Type: AWS::CloudFormation::Stack
     Properties:
