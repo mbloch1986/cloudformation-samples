@@ -13,6 +13,13 @@ Parameters:
     Type: String
 Resources:
   EC2SecurityGroup:
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W2
+            reason: "This is a public facing resource and ingress from the internet should be permitted."
+          - id: W9
+            reason: "This is a public facing resource and ingress from the internet should be permitted."
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security Group managed by Security

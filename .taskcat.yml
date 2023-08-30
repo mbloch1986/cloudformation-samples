@@ -46,3 +46,7 @@ tests:
     template: stacks/intrinsic-function-stack.yaml
     parameters:
       EC2KeyPairName: "$[taskcat_getkeypair]"
+  # macro-stack-example:
+  #   regions:
+  #     - ap-southeast-2
+  #   template: stacks/macro-stack.yaml
