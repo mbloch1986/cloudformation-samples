@@ -1,8 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: API Gateway Template
 Parameters:
-  PrereqStackName:
-    Description: Prerequisite Stack Name
+  CognitoUserPoolClientId:
+      Description: Cognito User Pool Client ID
+      Type: String
+  CognitoUserPoolId:
+    Description: Cognito User Pool ID
     Type: String
 Resources:
   ######################################## 
@@ -48,13 +51,13 @@ Resources:
         - "$request.header.Authorization"
       JwtConfiguration:
         Audience:
-          - !Sub "{{resolve:ssm:/${PrereqStackName}/Cognito/UserPoolClientId}}"
+          - !Ref CognitoUserPoolClientId
         Issuer: !Join 
           - ''
           - - "https://cognito-idp."
             - !Ref AWS::Region
             - ".amazonaws.com/"
-            - Fn::ImportValue: !Sub "${PrereqStackName}-cognito-user-pool-id"
+            - !Ref CognitoUserPoolId
 Outputs:
   oApiGatwayEndpointUrl:
     Description: The endpoint URL of the created API Gateway

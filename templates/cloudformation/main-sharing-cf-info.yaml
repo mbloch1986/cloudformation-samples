@@ -28,7 +28,9 @@ Resources:
             S3Bucket: !Ref S3TemplateBucketName
             S3KeyPrefix: !Ref S3TemplateKeyPrefix
       Parameters:
-        PrereqStackName: !Ref PrereqStackName
+        CognitoUserPoolId: 
+          Fn::ImportValue: !Sub "${PrereqStackName}-cognito-user-pool-id"
+        CognitoUserPoolClientId: !Sub "{{resolve:ssm:/${PrereqStackName}/Cognito/UserPoolClientId}}"
 Outputs:
   oApiGatwayEndpointUrl:
     Description: The endpoint URL of the created API Gateway
