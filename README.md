@@ -87,7 +87,13 @@ Before you begin testing your CloudFormation template with AWS TaskCat, make sur
 
 1. Open your terminal or command prompt.
 
-2. Run all test cases:
+2. Configure AWS CLI credentials
+
+  ```bash
+  aws configure
+  ```
+
+3. Run all test cases:
 
    ```bash
    taskcat test run
